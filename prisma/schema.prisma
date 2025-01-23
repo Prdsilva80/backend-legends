@@ -14,22 +14,32 @@ datasource db {
 }
 
 model Player {
-  id        Int    @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
   position  String
   teamId    Int
-  Team      Team   @relation(fields: [teamId], references: [id])
+  team      Team     @relation(fields: [teamId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Team {
-  id      Int       @id @default(autoincrement())
-  name    String
-  Players Player[]
+  id        Int       @id @default(autoincrement())
+  name      String
+  country   String
+  players   Player[]
+  events    Event[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Event {
-  id      Int      @id @default(autoincrement())
-  name    String
-  date    DateTime
+  id        Int      @id @default(autoincrement())
+  name      String
+  date      DateTime
+  location  String
+  teamId    Int
+  team      Team     @relation(fields: [teamId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
-
