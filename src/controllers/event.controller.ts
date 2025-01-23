@@ -4,6 +4,147 @@ import prisma from '../config/database';
 
 const router = Router();
 
+/**
+ * @swagger
+ * /events:
+ *   get:
+ *     summary: Lista todos os eventos esportivos
+ *     responses:
+ *       200:
+ *         description: Lista de eventos esportivos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   date:
+ *                     type: string
+ *                     format: date-time
+ *                   location:
+ *                     type: string
+ *                   teamId:
+ *                     type: integer
+ */
+
+/**
+ * @swagger
+ * /events/{id}:
+ *   get:
+ *     summary: Busca um evento por ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do evento
+ *     responses:
+ *       200:
+ *         description: Dados do evento
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 name:
+ *                   type: string
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                 location:
+ *                   type: string
+ *                 teamId:
+ *                   type: integer
+ *       404:
+ *         description: Evento não encontrado
+ */
+
+/**
+ * @swagger
+ * /events:
+ *   post:
+ *     summary: Cria um novo evento
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *               location:
+ *                 type: string
+ *               teamId:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Evento criado com sucesso
+ */
+
+/**
+ * @swagger
+ * /events/{id}:
+ *   put:
+ *     summary: Atualiza os dados de um evento
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do evento
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *               location:
+ *                 type: string
+ *               teamId:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Evento atualizado com sucesso
+ */
+
+/**
+ * @swagger
+ * /events/{id}:
+ *   delete:
+ *     summary: Remove um evento
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do evento
+ *     responses:
+ *       204:
+ *         description: Evento removido com sucesso
+ *       404:
+ *         description: Evento não encontrado
+ */
+
 // GET: Listar todos os eventos esportivos
 router.get('/', (req: Request, res: Response) => {
     prisma.event.findMany()

@@ -4,6 +4,135 @@ import prisma from '../config/database';
 
 const router = Router();
 
+/**
+ * @swagger
+ * /players:
+ *   get:
+ *     summary: Lista todos os jogadores
+ *     responses:
+ *       200:
+ *         description: Lista de jogadores
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   position:
+ *                     type: string
+ *                   teamId:
+ *                     type: integer
+ */
+
+/**
+ * @swagger
+ * /players/{id}:
+ *   get:
+ *     summary: Busca um jogador por ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do jogador
+ *     responses:
+ *       200:
+ *         description: Dados do jogador
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 name:
+ *                   type: string
+ *                 position:
+ *                   type: string
+ *                 teamId:
+ *                   type: integer
+ *       404:
+ *         description: Jogador não encontrado
+ */
+
+/**
+ * @swagger
+ * /players:
+ *   post:
+ *     summary: Cria um novo jogador
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               position:
+ *                 type: string
+ *               teamId:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Jogador criado com sucesso
+ */
+
+/**
+ * @swagger
+ * /players/{id}:
+ *   put:
+ *     summary: Atualiza os dados de um jogador
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do jogador
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               position:
+ *                 type: string
+ *               teamId:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Jogador atualizado com sucesso
+ */
+
+/**
+ * @swagger
+ * /players/{id}:
+ *   delete:
+ *     summary: Remove um jogador
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do jogador
+ *     responses:
+ *       204:
+ *         description: Jogador removido com sucesso
+ *       404:
+ *         description: Jogador não encontrado
+ */
+
 // GET: Listar todos os jogadores
 router.get('/', (req: Request, res: Response) => {
     prisma.player.findMany()
