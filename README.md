@@ -33,7 +33,7 @@
 1. Clone o repositório:
 
     ```
-    git clone https://github.com/seu-usuario/backend-legends.git
+    git clone git@github.com:Prdsilva80/backend-legends.git
     cd backend-legends
     ```
 
