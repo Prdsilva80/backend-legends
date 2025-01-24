@@ -46,8 +46,9 @@
 3. Configure as variáveis de ambiente criando um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
 
     ```
-    DATABASE_URL=postgresql://seu-usuario:senha@localhost:5432/backend_legends
-    PORT=3000
+    DATABASE_URL=
+    PORT=
+    API_FUTEBOL_KEY=
     ```
 
 4. Execute as migrações para criar as tabelas no banco de dados:
