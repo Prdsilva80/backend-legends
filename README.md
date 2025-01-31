@@ -5,7 +5,7 @@
 **Backend Legends** é uma API RESTful desenvolvida em Node.js com Express e Prisma para gerenciar dados relacionados a esportes. O projeto inclui funcionalidades como:
 
 - Cadastro de jogadores, times e eventos esportivos.
-- Integração com a API Futebol para informações de campeonatos.
+- Integração com a [API Futebol](https://www.api-futebol.com.br/) para informações de campeonatos.
 - Consumo do Campeonato Paulista como exemplo principal, destacando a temporada de 2025.
 - Simulação de partidas e estatísticas esportivas.
 - Documentação da API com Swagger.
@@ -152,7 +152,7 @@ A documentação da API está disponível no Swagger em:
 - **GET /api/futebol/competitions/:id/teams:** Lista os times de um campeonato.
 - **GET /api/futebol/competitions/:id/matches:** Lista as partidas de um campeonato.
 
-**NOTA:** A API Futebol foi configurada para consumir dados do Campeonato Paulista, representando os campeonatos estaduais em curso no momento.
+**NOTA:** A [API Futebol](https://www.api-futebol.com.br/) foi configurada para consumir dados do Campeonato Paulista, representando os campeonatos estaduais em curso no momento.
 
 **Testes**
 
