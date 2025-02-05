@@ -1,6 +1,7 @@
-import { Router } from 'express';
-import type { Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import { body, param, validationResult } from 'express-validator';
 import prisma from '../config/database';
+import logger from '../config/logger';
 
 const router = Router();
 
@@ -133,55 +134,131 @@ const router = Router();
  *         description: Jogador não encontrado
  */
 
-// GET: Listar todos os jogadores
-router.get('/', (req: Request, res: Response) => {
-    prisma.player.findMany()
-        .then(players => res.json(players))
-        .catch(() => res.status(500).json({ error: 'Erro ao buscar jogadores' }));
+// Middleware para validar erros de entrada
+const validate = (req: Request, res: Response, next: NextFunction): void => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logger.error(`Erro de validação: ${JSON.stringify(errors.array())}`);
+        res.status(400).json({ errors: errors.array() });
+        return;
+    }
+    next();
+};
+
+router.use((req: Request, res: Response, next: NextFunction): void => {
+    logger.info(`${req.method} ${req.url}`);
+    next();
 });
 
-// GET: Buscar jogador por ID
-router.get('/:id', (req: Request, res: Response) => {
-    prisma.player.findUnique({
-        where: { id: Number(req.params.id) }
-    })
-        .then(player => {
+router.get('/', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const players = await prisma.player.findMany();
+        res.json(players);
+    } catch (error) {
+        logger.error('Erro ao buscar jogadores:', error);
+        res.status(500).json({ error: 'Erro ao buscar jogadores' });
+    }
+});
+
+router.get(
+    '/:id',
+    [param('id').isInt().withMessage('O ID deve ser um número inteiro')],
+    validate,
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const player = await prisma.player.findUnique({
+                where: { id: Number(req.params.id) },
+            });
             if (!player) {
-                return res.status(404).json({ error: 'Jogador não encontrado' });
+                res.status(404).json({ error: 'Jogador não encontrado' });
+                return;
             }
             res.json(player);
-        })
-        .catch(() => res.status(500).json({ error: 'Erro ao buscar jogador' }));
-});
+        } catch (error) {
+            logger.error('Erro ao buscar jogador:', error);
+            res.status(500).json({ error: 'Erro ao buscar jogador' });
+        }
+    }
+);
 
-// POST: Criar jogador
-router.post('/', (req: Request, res: Response) => {
-    const { name, position, teamId } = req.body;
-    prisma.player.create({
-        data: { name, position, teamId }
-    })
-        .then(player => res.status(201).json(player))
-        .catch(() => res.status(500).json({ error: 'Erro ao criar jogador' }));
-});
+router.post(
+    '/',
+    [
+        body('name').isString().trim().notEmpty().withMessage('Nome é obrigatório'),
+        body('position').isString().trim().notEmpty().withMessage('Posição é obrigatória'),
+        body('teamId').isInt().withMessage('teamId deve ser um número inteiro'),
+    ],
+    validate,
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const { name, position, teamId } = req.body;
+            const player = await prisma.player.create({
+                data: { name, position, teamId },
+            });
+            res.status(201).json(player);
+        } catch (error) {
+            logger.error('Erro ao criar jogador:', error);
+            res.status(500).json({ error: 'Erro ao criar jogador' });
+        }
+    }
+);
 
-// PUT: Atualizar jogador
-router.put('/:id', (req: Request, res: Response) => {
-    const { name, position, teamId } = req.body;
-    prisma.player.update({
-        where: { id: Number(req.params.id) },
-        data: { name, position, teamId }
-    })
-        .then(player => res.json(player))
-        .catch(() => res.status(500).json({ error: 'Erro ao atualizar jogador' }));
-});
+router.put(
+    '/:id',
+    [
+        param('id').isInt().withMessage('O ID deve ser um número inteiro'),
+        body('name').optional().isString().trim(),
+        body('position').optional().isString().trim(),
+        body('teamId').optional().isInt(),
+    ],
+    validate,
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const { name, position, teamId } = req.body;
+            const updateData: any = {};
 
-// DELETE: Remover jogador
-router.delete('/:id', (req: Request, res: Response) => {
-    prisma.player.delete({
-        where: { id: Number(req.params.id) }
-    })
-        .then(() => res.status(204).send())
-        .catch(() => res.status(500).json({ error: 'Erro ao excluir jogador' }));
-});
+            if (name) updateData.name = name;
+            if (position) updateData.position = position;
+            if (teamId) updateData.teamId = teamId;
+
+            const player = await prisma.player.update({
+                where: { id: Number(req.params.id) },
+                data: updateData,
+            });
+
+            res.json(player);
+        } catch (error) {
+            logger.error('Erro ao atualizar jogador:', error);
+            res.status(500).json({ error: 'Erro ao atualizar jogador' });
+        }
+    }
+);
+
+router.delete(
+    '/:id',
+    [param('id').isInt().withMessage('O ID deve ser um número inteiro')],
+    validate,
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const player = await prisma.player.findUnique({
+                where: { id: Number(req.params.id) },
+            });
+
+            if (!player) {
+                res.status(404).json({ error: 'Jogador não encontrado' });
+                return;
+            }
+
+            await prisma.player.delete({
+                where: { id: Number(req.params.id) },
+            });
+
+            res.status(204).send();
+        } catch (error) {
+            logger.error('Erro ao excluir jogador:', error);
+            res.status(500).json({ error: 'Erro ao excluir jogador' });
+        }
+    }
+);
 
 export default router;
